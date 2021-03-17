@@ -1,29 +1,29 @@
-This module contains an implementation of a flow page section repeater.
+This module contains a component which presents as a button on the page.
 
-It overrides the basic CHART container component.
+When pressed iot will convert the entire Flow page on screen to a PDF and push it to the browser as a download file.
 
-It allows attaching a list to a container and for each element in that list the child elements of the container will be repeated per list item.
 
 The latest version can be included in your player from this location: -
 
 ```
-https://files-manywho-com.s3.amazonaws.com/e1dbcceb-070c-4ce6-95b0-ba282aaf4f48/psr.js
-https://files-manywho-com.s3.amazonaws.com/e1dbcceb-070c-4ce6-95b0-ba282aaf4f48/psr.css
+https://files-manywho-com.s3.amazonaws.com/e1dbcceb-070c-4ce6-95b0-ba282aaf4f48/pdf.js
+https://files-manywho-com.s3.amazonaws.com/e1dbcceb-070c-4ce6-95b0-ba282aaf4f48/pdf.css
 ```
 
 
 ## Functionality
 
-When working on a list of values and each one needs to be presented as a repeating block of Flow Page then this module gives that functionality.
+Required the ability to render an entire Flow page to a PDF in a graphically correct way.
 
-Like a table but a repeating page section, designed in the standard page designer.
+You place this component on a page and it shows a simple button which when pressed will convert the page or part to a PDF file.
 
-Any page container defined as CHART layout will be hijacked and replaced with this new class.
+It uses html2canvas to render the page as an image then jsPDF to put that image into a4 pages.
 
-The container should have an attribute named "ListName" which contains the name of a list value in Flow containing 0-many objects
+Background images are converted to data uris on the fly to avoid cors issues in html2canvas.
 
-The repeated child elements are simply copied, as is, and added to the page tied to the fields of the current list item.
+## Component Settings
 
+width and height if spacified control the component's dimensions - in pixels.
 
 
 ## Component Attributes
@@ -32,23 +32,23 @@ The repeated child elements are simply copied, as is, and added to the page tied
 
 Like all components, adding a "classes" attribute will cause that string to be added to the base container's class value
 
-### ListName
+### SelectorClass
 
-Applied as an attribute on the base repeating container.
+If specified then the component will find the first element on the page with this class and use that as the base of the pdf.
 
-Tells the container where to get its list of values to repeat.
+If not specified then the <body> tag is used
 
-The developerName of the list.
+### icon
 
-### FieldName
+The glyphicon name to display
 
-Applied at the page component level.
+### display
 
-Tells the component which attribute of the list item to present.
+Controls the display, optional, defaults to just the label text.
 
-Just the attribute name excluding the parent object.
+options are : - icon, iconandtext, text
 
-If the repeating list object itself contains a complex object with attributes then you can specify this with attributeName->childAttributeName adding the arrow separator "->"
+
 
 
 
