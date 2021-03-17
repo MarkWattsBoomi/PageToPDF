@@ -23,7 +23,7 @@ Background images are converted to data uris on the fly to avoid cors issues in 
 
 ## Component Settings
 
-width and height if spacified control the component's dimensions - in pixels.
+width and height if specified control the component's dimensions - in pixels.
 
 
 ## Component Attributes
