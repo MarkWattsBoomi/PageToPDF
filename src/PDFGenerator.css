@@ -4,13 +4,34 @@
     align-content: center;
 }
 
-.pdfg-icon {
-    font-size: 2rem;
+.pdfg-button {
+    display: flex;
+    flex-direction: row;
+    align-content: center;
+    background-color: #888;
     margin-left: auto;
     margin-right: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    color: #fefefe;
     cursor: pointer;
+    border-radius: .5rem;
 }
 
-.pdfg-icon:hover {
+.pdfg-button:hover {
     color:deepskyblue;
 }
+
+.pdfg-icon {
+    font-size: 1.2rem;
+    top: 0 !important;
+    margin: auto;
+    margin-right: 0.5rem;
+}
+
+.pdfg-label {
+    font-size: 1.2rem;
+    top: 0 !important;
+    margin: auto;
+}
+
