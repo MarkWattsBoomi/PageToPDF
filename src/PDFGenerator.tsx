@@ -15,6 +15,35 @@ export default class PDFGenerator extends React.Component<any,any> {
         this.toDataUri = this.toDataUri.bind(this);
     }
 
+    async getImage(url: string) : Promise<Blob> {
+        return new Promise((resolve) => {
+            /*
+            var img = new Image();
+            //document.appendChild(img);
+            img.crossOrigin = 'Anonymous';
+            img.onload = function(){
+                let canvas: any = document.createElement('CANVAS'),
+                ctx = canvas.getContext('2d'), dataURL;
+                canvas.height = img.height;
+                canvas.width = img.width;
+                ctx.drawImage(img, 0, 0);
+                dataURL = canvas.toDataURL();
+                canvas = null; 
+                resolve(dataURL);
+            };
+            img.src = url;
+            */
+            var xhr = new XMLHttpRequest();
+            xhr.responseType = "blob";
+            xhr.open("GET",url);
+            xhr.onload = function() {
+                const blob: Blob = xhr.response;   
+                resolve(blob);
+              }
+            xhr.send();
+            
+        });
+    }
 
     async toDataUri(blob: any) : Promise<string> {
         return new Promise((resolve) => {
@@ -24,7 +53,7 @@ export default class PDFGenerator extends React.Component<any,any> {
               const base64data: string = reader.result as string;   
               resolve(base64data);
             }
-          });
+        });
     }
 
     async printPage() {
@@ -45,11 +74,12 @@ export default class PDFGenerator extends React.Component<any,any> {
             let div:  HTMLDivElement = divs[pos];  
             if(div.style.backgroundImage != '') {
                 let url: string = div.style.backgroundImage.replace("url(\"","").replace("\")","");
-                console.log(url);
-                let data = await fetch(url);
-                let blob = await data.blob();
-                let dataUri : string = await this.toDataUri(blob);
-                div.style.backgroundImage="url(\"" + dataUri + "\")";
+
+
+                
+                //let blob = await this.getImage(url);
+                //let dataUri : string = await this.toDataUri(blob);
+                //div.style.backgroundImage="url(\"" + dataUri + "\")";
             }
         };
 
@@ -59,15 +89,20 @@ export default class PDFGenerator extends React.Component<any,any> {
         let pageWidth = 210; 
         let pageHeight = 295;  
         let imgHeight = canvas.height * (pageWidth / canvas.width); //scaled based onactual width vs page width
+
+        pageHeight = imgHeight;
         //let heightLeft = imgHeight;
 
         let doc = new jsPDF({
             orientation: "portrait",
             unit: "mm",
-            format: "a4",
+            format: [pageWidth,pageHeight] //"a4",
+            
         }); 
 
+        doc = doc.addImage(imageData, 'PNG', 0, 0, pageWidth, imgHeight);
 
+        /*
         ; // current pos vertically in the image
         let page = 0; //current page
 
@@ -88,7 +123,7 @@ export default class PDFGenerator extends React.Component<any,any> {
             position += heightLeft - imgHeight;
             
         }
-
+*/
         //doc.output('datauri');
         doc.save( 'file.pdf');
     }
