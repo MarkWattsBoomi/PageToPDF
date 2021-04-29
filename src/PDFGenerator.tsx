@@ -1,62 +1,26 @@
 
 import React, {CSSProperties, useState} from "react";
-import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import domtoimage from 'dom-to-image';
 import './PDFGenerator.css';
 
 declare const manywho: any;
 
 export default class PDFGenerator extends React.Component<any,any> {
     
-    
+    printing: boolean = false; 
     constructor(props: any) {
         super(props);
         this.printPage = this.printPage.bind(this);
-        this.toDataUri = this.toDataUri.bind(this);
     }
 
-    async getImage(url: string) : Promise<Blob> {
-        return new Promise((resolve) => {
-            /*
-            var img = new Image();
-            //document.appendChild(img);
-            img.crossOrigin = 'Anonymous';
-            img.onload = function(){
-                let canvas: any = document.createElement('CANVAS'),
-                ctx = canvas.getContext('2d'), dataURL;
-                canvas.height = img.height;
-                canvas.width = img.width;
-                ctx.drawImage(img, 0, 0);
-                dataURL = canvas.toDataURL();
-                canvas = null; 
-                resolve(dataURL);
-            };
-            img.src = url;
-            */
-            var xhr = new XMLHttpRequest();
-            xhr.responseType = "blob";
-            xhr.open("GET",url);
-            xhr.onload = function() {
-                const blob: Blob = xhr.response;   
-                resolve(blob);
-              }
-            xhr.send();
-            
-        });
+    shouldComponentUpdate(nextProps: any, nextState: any) {
+        return !this.printing;
     }
-
-    async toDataUri(blob: any) : Promise<string> {
-        return new Promise((resolve) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(blob); 
-            reader.onloadend = function() {
-              const base64data: string = reader.result as string;   
-              resolve(base64data);
-            }
-        });
-    }
+    
 
     async printPage() {
+        this.printing = true;
         let comp = manywho.model.getComponent(this.props.id,this.props.flowKey);
         let selector: string = comp.attributes["SelectorClass"];
         let src: any;
@@ -66,68 +30,33 @@ export default class PDFGenerator extends React.Component<any,any> {
         else {
             src=document.body;
         }
-        //window.print();
-        //let paper = document.getElementsByClassName("sum-paper")[0];
-        let divs : HTMLCollectionOf<HTMLDivElement> = src.getElementsByTagName("div");
+    
+        let img = await domtoimage.toPng(src);
+        const imgager = new Image();
+        imgager.onload = function() {
 
-        for(let pos = 0 ; pos < divs.length ; pos++){
-            let div:  HTMLDivElement = divs[pos];  
-            if(div.style.backgroundImage != '') {
-                let url: string = div.style.backgroundImage.replace("url(\"","").replace("\")","");
+            let pageWidth = 420; 
+            let factor: number = pageWidth / imgager.width; // 10000 / canvas.height ;
+            let imageHeight: number = imgager.height * factor;
+            let imageWidth: number = imgager.width * factor;
 
-
-                
-                //let blob = await this.getImage(url);
-                //let dataUri : string = await this.toDataUri(blob);
-                //div.style.backgroundImage="url(\"" + dataUri + "\")";
-            }
-        };
-
-        let canvas = await html2canvas(src as HTMLElement,{allowTaint: false});
-        let imageData = canvas.toDataURL('image/png');
-
-        let pageWidth = 210; 
-        let pageHeight = 295;  
-        let imgHeight = canvas.height * (pageWidth / canvas.width); //scaled based onactual width vs page width
-
-        pageHeight = imgHeight;
-        //let heightLeft = imgHeight;
-
-        let doc = new jsPDF({
-            orientation: "portrait",
-            unit: "mm",
-            format: [pageWidth,pageHeight] //"a4",
-            
-        }); 
-
-        doc = doc.addImage(imageData, 'PNG', 0, 0, pageWidth, imgHeight);
-
-        /*
-        ; // current pos vertically in the image
-        let page = 0; //current page
-
-        //doc.addImage(imageData, 'PNG', 0, position, imgWidth, imgHeight);
-        //heightLeft -= pageHeight;
-
-        let position = 10;
-        let heightLeft = imgHeight;
-        while (imgHeight - (page  * pageHeight) > 0) {
-            if(page > 0) {
-                doc.addPage();
-            }
-            
-            let offset = -(pageHeight * page);
-            doc = doc.addImage(imageData, 'PNG', 0, offset, pageWidth, imgHeight);
-            page++;
-            
-            position += heightLeft - imgHeight;
+            let doc = new jsPDF({
+                orientation: "portrait",
+                unit: "px",
+                format: [imageWidth,imageHeight] 
+            }); 
+    
+            doc = doc.addImage(img, 'PNG', 0, 0, imageWidth,imageHeight);
+    
+            doc.save( 'file.pdf');
             
         }
-*/
-        //doc.output('datauri');
-        doc.save( 'file.pdf');
+        imgager.src = img;
+        
+        this.printing = false;
     }
-    
+
+
     render() {
         let comp = manywho.model.getComponent(this.props.id,this.props.flowKey);
         let classes: string = "pdfg " + (comp.attributes["classes"]? comp.attributes["classes"] : "");
