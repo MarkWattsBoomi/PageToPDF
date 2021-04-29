@@ -35,3 +35,32 @@
     margin: auto;
 }
 
+.wait-redaction 
+{
+    display: flex;
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    z-index: 9999;
+    opacity: 1;
+    overflow-x: hidden;
+    overflow-y: auto;
+    pointer-events: all;
+  }
+
+  .wait-message
+  {
+    box-shadow: 0, 0, 5px, rgba(0, 0, 0, 0.2) !important;
+    display: flex!important;
+    margin: auto;
+    position: relative !important;
+    background-color: antiquewhite !important;
+    border-radius: 3px;
+    border: 2px solid #666;
+    overflow: visible  !important;
+
+  }
+
